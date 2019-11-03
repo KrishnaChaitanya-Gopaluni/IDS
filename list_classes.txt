@@ -34,7 +34,7 @@
 'httptunnel.', #R2L
 'processtable.', #DoS
 'ps.',          #U2R
-'saint.',       #
+'saint.',       
 'sendmail.',   # DOS
 'snmpgetattack.',#R2L
 'snmpguess.',
