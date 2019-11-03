@@ -1,0 +1,42 @@
+['back.', 
+'buffer_overflow.', 
+'ftp_write.', 
+'guess_passwd.', 
+'imap.',  
+'ipsweep.', 
+'land.', 
+'loadmodule.', 
+'multihop.', 
+'neptune.',
+'nmap.', 
+'normal.', 
+'perl.',
+'phf.', 
+'pod.', 
+'portsweep.',
+'rootkit.',
+'satan.',
+'smurf.', 
+'spy.', 
+'teardrop.', 
+'warezclient.',
+'warezmaster.']
+
+
+
+#14 additional classes in text data
+
+['apache2.',#DoS
+'worm.',
+'xlock.', #R2L
+'xsnoop.',#R2L
+'xterm.', #U2R
+'httptunnel.', #R2L
+'processtable.', #DoS
+'ps.',          #U2R
+'saint.',       #
+'sendmail.',   # DOS
+'snmpgetattack.',#R2L
+'snmpguess.',
+'sqlattack.', #U2R
+'udpstorm.'] #DoS
