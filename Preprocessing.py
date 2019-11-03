@@ -10,8 +10,8 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
 #read data
-files = glob.glob('*.csv')
-df = pd.read_csv(files[0])
+# files = glob.glob('./*.csv')
+df = pd.read_csv('./kddcup.csv')
                                                                             # df = Parallel(n_jobs=mp.cpu_count())(delayed(pd.read_csv)(i, low_memory=False) for i in files)
                                                                             # df = pd.concat(df)
 '''
@@ -90,7 +90,7 @@ del cat_var_encoded
 def replace_cols(i):
     df[i] = cat_var_encoded_df[i]
 [ replace_cols(i) for i in cat_cols]
-del cat_var_encoded_df # df.to_csv("kdd_encodes.csv")
+del cat_var_encoded_df # df.to_csv("./kdd_encodes.csv")
 
 #verify index of the col names 
 df.iloc[:,1:4].columns
