@@ -9,6 +9,7 @@ import sys
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
+
 #read data
 # files = glob.glob('./*.csv')
 df = pd.read_csv('./kddcup.csv')

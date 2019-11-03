@@ -1,10 +1,12 @@
 import pandas as pd 
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
+from sklearn import preprocessing
 
+#read the dataset to viz
 df = pd.read_csv('../kddcup_10_percent_corrected.csv')
 
-
+#name the columns 
 df.columns = ["duration",
 "protocol_type",
 "service",
@@ -48,20 +50,16 @@ df.columns = ["duration",
 "dst_host_srv_rerror_rate",
 "classes"]
 
+#name all the intrusions as "attack"
 def classname_replace(x):
     if x != 'normal.':
         return 'attack'
     return x        
-
 df["classes"] = df["classes"].apply(classname_replace)
-# g = sns.PairGrid(df)
-# g = g.map_diag(plt.hist)
-# g = g.map_offdiag(plt.scatter)
-# g.savefig("pair_plots.png")
 
-
+#plot the graphs 
 plt.style.use('classic')
-# %matplotlib inline
+
 g = sns.PairGrid(df[["duration",
 #"protocol_type",
 # "service",
@@ -75,3 +73,26 @@ g = g.map_diag(plt.hist)
 g = g.map_offdiag(plt.scatter)
 g.add_legend()
 g.savefig("pair_plots_with_label.png")
+
+
+#Scaling the features for better viz
+mm_scaler = preprocessing.MinMaxScaler()
+X_train_minmax = mm_scaler.fit_transform(df[["duration",
+"src_bytes",
+"dst_bytes",
+"wrong_fragment",
+"urgent"]])# mm_scaler.transform(X_test)
+
+basic_featues = pd.DataFrame(X_train_minmax, columns=["duration",
+"src_bytes",
+"dst_bytes",
+"wrong_fragment",
+"urgent"] )
+
+basic_featues["classes"] = df["classes"]
+
+g = sns.PairGrid(basic_featues, hue = "classes")
+g = g.map_diag(plt.hist)
+g = g.map_offdiag(plt.scatter)
+g.add_legend()
+g.savefig("pair_plots_with_label_basic_STDfeatures.png")
