@@ -91,7 +91,10 @@ del cat_var_encoded
 def replace_cols(i):
     df[i] = cat_var_encoded_df[i]
 [ replace_cols(i) for i in cat_cols]
-del cat_var_encoded_df # df.to_csv("./kdd_encodes.csv")
+del cat_var_encoded_df
+
+
+    
 
 #verify index of the col names 
 df.iloc[:,1:4].columns
@@ -103,7 +106,7 @@ df.iloc[:,[1,2,3, 6,11,20,21]]
 
 
 #one hot encoder
-onehotencoder = OneHotEncoder(categorical_features = [1,2,3, 6,11,20,21])
-df = onehotencoder.fit_transform(df).toarray()
+# onehotencoder = OneHotEncoder(categorical_features = [1,2,3, 6,11,20,21])
+# df = onehotencoder.fit_transform(df).toarray()
 
 
