@@ -1,32 +1,66 @@
 import pandas as pd 
 import numpy as np
+from sklearn.feature_extraction import FeatureHasher
+import xgboost
+from sklearn.model_selection import train_test_split
 
 
-data = pd.read_csv("../kdd_encodes.csv")
-columns= ["duration", "protocol_type", "service", "flag", "src_bytes", "dst_bytes", "land", "wrong_fragment", "urgent", "hot", "num_failed_logins", "logged_in", "num_compromised", "root_shell", "su_attempted", "num_root", "num_file_creations", "num_shells", "num_access_files", "num_outbound_cmds", "is_host_login", "is_guest_login", "count", "srv_count", "serror_rate", "srv_serror_rate", "rerror_rate", "srv_rerror_rate", "same_srv_rate", "diff_srv_rate", "srv_diff_host_rate", "dst_host_count", "dst_host_srv_count", "dst_host_same_srv_rate", "dst_host_diff_srv_rate", "dst_host_same_src_port_rate", "dst_host_srv_diff_host_rate", "dst_host_serror_rate", "dst_host_srv_serror_rate", "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "classes"] 
 
-#now columns has only continuous variables
-[columns.remove(i) for i in ["protocol_type","service","flag","land","logged_in", "is_host_login","is_guest_login"]]
+'''
+read data and name the columns
+'''
+def read_data(filename):
+    data = pd.read_csv('../'+filename+'.csv')
+    data.columns = ["duration", "protocol_type", "service", "flag", "src_bytes", "dst_bytes", "land", "wrong_fragment", "urgent", "hot", "num_failed_logins", "logged_in", "num_compromised", "root_shell", "su_attempted", "num_root", "num_file_creations", "num_shells", "num_access_files", "num_outbound_cmds", "is_host_login", "is_guest_login", "count", "srv_count", "serror_rate", "srv_serror_rate", "rerror_rate", "srv_rerror_rate", "same_srv_rate", "diff_srv_rate", "srv_diff_host_rate", "dst_host_count", "dst_host_srv_count", "dst_host_same_srv_rate", "dst_host_diff_srv_rate", "dst_host_same_src_port_rate", "dst_host_srv_diff_host_rate", "dst_host_serror_rate", "dst_host_srv_serror_rate", "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "classes"] 
+    return data
 
-cat_vars = ["protocol_type","service","flag","land","logged_in", "is_host_login","is_guest_login"]
 
-#name all the intrusions as "attack"
-def classname_replace(x):
+'''
+naming intrusions
+'''
+def className_replace(x):
     if x != 'normal.':
         return 'attack'
     return x        
-data["classes"] = data["classes"].apply(classname_replace)
+
+'''
+Use feature hasing rather than one hot encoding for the features  ["protocol_type","service","flag"] . Because, these Categorical feature have many
+unique values. It's feasible to use one hot here.
+'''
+def encodeFeatures(data):
+            #feature hashing         
+    fh = FeatureHasher(n_features=6, input_type='string')
+    ef1 = pd.concat([pd.DataFrame(fh.fit_transform(data[i]).toarray()) for i in cat_vars if i in ["protocol_type","service","flag"]], axis = 1)
+    hash_features_names = ["protocol_type","service","flag"]
+    hash_features_names = [hash_features_names[i]+'_'+str(j) for i in range(3) for j in range(6)]
+    ef1.columns = hash_features_names
+
+            #one hot encoding for other 4 Categorical features (before encoding each value is either 0 or 1 )
+    ef2 = [pd.get_dummies(data[i], prefix=i) for i in cat_vars if i not in ["protocol_type","service","flag"]]
+    ef2.append(ef1)
+    return pd.concat(ef2,axis=1)
+
+#preparing train data
+data=  read_data('train')
+columns = data.columns.tolist()
+[columns.remove(i) for i in ["protocol_type","service","flag","land","logged_in", "is_host_login","is_guest_login"]]# get continuous column names
+cat_vars = ["protocol_type","service","flag","land","logged_in", "is_host_login","is_guest_login"]
+data["classes"] = data["classes"].apply(className_replace)
+data =  pd.concat([encodeFeatures(data), data[columns]], axis = 1) # encode Categorical and concat with continuos 
 
 
-#one hot encoding
-cat_conti_data = [pd.get_dummies(data[i], prefix=i) for i in cat_vars]
-cat_conti_data.append(data[columns])
-data2 = pd.concat(cat_conti_data,axis=1)
+#preparing test data
+test = read_data('test')
+test["classes"] = test["classes"].apply(className_replace)
+test =  pd.concat([encodeFeatures(test), test[columns]], axis = 1) # encode Categorical and concat with continuos 
 
-del cat_conti_data
-del data
 
-data2.to_csv("../kdd_encodes_2.csv")
+
+
+#label encoding
+
+# y_pred = classifier.predict(test2)
+
 
 #--------mock model--------------------#
 import xgboost
@@ -51,59 +85,6 @@ del y_train
 del y_test
 del y_pred
 
-#---------------------------------------------------------------#
-#preparing test data
-
-test = pd.read_csv("../corrected.csv")
-
-
-columns= ["duration", "protocol_type", "service", "flag", "src_bytes", "dst_bytes", "land", "wrong_fragment", "urgent", "hot", "num_failed_logins", "logged_in", "num_compromised", "root_shell", "su_attempted", "num_root", "num_file_creations", "num_shells", "num_access_files", "num_outbound_cmds", "is_host_login", "is_guest_login", "count", "srv_count", "serror_rate", "srv_serror_rate", "rerror_rate", "srv_rerror_rate", "same_srv_rate", "diff_srv_rate", "srv_diff_host_rate", "dst_host_count", "dst_host_srv_count", "dst_host_same_srv_rate", "dst_host_diff_srv_rate", "dst_host_same_src_port_rate", "dst_host_srv_diff_host_rate", "dst_host_serror_rate", "dst_host_srv_serror_rate", "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "classes"] 
-test.columns = columns
-
-test["classes"] = test["classes"].apply(classname_replace)
-
-from sklearn.preprocessing import LabelEncoder
-
-#label encoding
-cat_cols = ["protocol_type","service","flag","land","logged_in", "is_host_login","is_guest_login"]
-labelencoder = LabelEncoder()
-categorical_var = [test["protocol_type"],test["service"],test["flag"],test["land"],test["logged_in"], test["is_host_login"],test["is_guest_login"]]
-cat_var_encoded = list(map(labelencoder.fit_transform, categorical_var))
-cat_var_encoded = [i.tolist() for i in cat_var_encoded]
-del categorical_var
-
-#transposing
-def transpoese_list(j):
-    return [cat_var_encoded[i][j] for i in range(7)]
-cat_var_encoded = list(map(transpoese_list,range(311028)))
-
-#create DF of cat vars
-cat_var_encoded_df = pd.DataFrame(cat_var_encoded,columns=["protocol_type","service","flag","land","logged_in", "is_host_login","is_guest_login"])
-del cat_var_encoded
-
-#replace original cols with encoded cols
-def replace_cols(i):
-    test[i] = cat_var_encoded_df[i]
-[ replace_cols(i) for i in cat_cols]
-del cat_var_encoded_df
-
-
-''' this type of one hot encoding is not good if test data has missing cat values in a feature'''
-'''
-#rerun line 51 before code below executes
-#one hot encoding
-cat_conti_data = [pd.get_dummies(test[i], prefix=i) for i in cat_vars]
-cat_conti_data.append(test[columns])
-test2 = pd.concat(cat_conti_data,axis=1)
-
-[i for i in data2.columns.tolist() if i not in test2.columns.tolist()] #['service_65', 'service_66', 'service_67', 'service_68', 'service_69']  these are the 5 missing columns in the testing dataset
-'''
 
 
 
-del cat_conti_data
-del test
-
-test2.to_csv("../test_encodes.csv")
-
-y_pred = classifier.predict(test2)
