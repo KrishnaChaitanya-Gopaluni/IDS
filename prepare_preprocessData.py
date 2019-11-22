@@ -1,8 +1,6 @@
 import pandas as pd 
 import numpy as np
 from sklearn.feature_extraction import FeatureHasher
-import xgboost
-from sklearn.model_selection import train_test_split
 
 
 
@@ -57,33 +55,43 @@ test =  pd.concat([encodeFeatures(test), test[columns]], axis = 1) # encode Cate
 
 
 
-#label encoding
-
-# y_pred = classifier.predict(test2)
-
 
 #--------mock model--------------------#
 import xgboost
-from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(data2.iloc[:,0:126], data2.iloc[:,126], test_size = 0.2, random_state = 10)
-classifier = xgboost.XGBClassifier()
-
-classifier.fit(X_train, y_train)
-
-y_pred = classifier.predict(X_test)
-
+import multiprocessing as mp
 from sklearn.metrics import accuracy_score
-accuracy = accuracy_score(y_test, y_pred, normalize=True)
-print(accuracy) #0.9998019773682588
+from sklearn.metrics import precision_score
 
-# train the remaining data
-classifier.fit(X_test, y_test)
-del X_train
-del X_test
-del y_train
-del y_test
-del y_pred
+# X_train, X_test, y_train, y_test = train_test_split(data2.iloc[:,0:126], data2.iloc[:,126], test_size = 0.2, random_state = 10)
+classifier = xgboost.XGBClassifier(n_jobs=mp.cpu_count())
+
+classifier.fit(data.iloc[:,0:60], data[['classes']])
+
+y_pred = classifier.predict(test.iloc[:,0:60])
+
+
+accuracy = accuracy_score(test[['classes']], y_pred, normalize=True)
+print(accuracy) #0.9273891739650449
+
+
+pres_normal_wt = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='weighted')
+pres_normal_micro = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='micro')
+pres_normal_macro = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='macro')
+pres_normal_binary = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='binary')
+
+
+#0.7299779751676065
+pres_normal_wt = precision_score(test[['classes']], y_pred, labels=['normal.'], pos_label = 'normal.',average ='weighted')
+pres_normal_micro = precision_score(test[['classes']], y_pred, labels=[ 'normal.'], pos_label = 'normal.',average ='micro')
+pres_normal_macro = precision_score(test[['classes']], y_pred, labels=['normal.'], pos_label = 'normal.',average ='macro')
+pres_normal_binary = precision_score(test[['classes']], y_pred, labels=['normal.'], pos_label = 'normal.',average ='binary')
+
+
+#0.9988134539436238
+pres_attack_wt = precision_score(test[['classes']], y_pred, labels=['attack'], pos_label = 'attack',average ='weighted')
+pres_attack_micro = precision_score(test[['classes']], y_pred, labels=['attack'], pos_label = 'attack',average ='micro')
+pres_attack_macro = precision_score(test[['classes']], y_pred, labels=['attack'], pos_label = 'attack',average ='macro')
+pres_attack_binary = precision_score(test[['classes']], y_pred, labels=['attack'], pos_label = 'attack',average ='binary')
 
 
 

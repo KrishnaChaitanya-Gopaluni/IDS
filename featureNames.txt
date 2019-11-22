@@ -1,3 +1,4 @@
+# feature names in the format <"classname:><space><continuous/symbolic>
 duration: continuous.
 protocol_type: symbolic.
 service: symbolic.
@@ -39,3 +40,71 @@ dst_host_serror_rate: continuous.
 dst_host_srv_serror_rate: continuous.
 dst_host_rerror_rate: continuous.
 dst_host_srv_rerror_rate: continuous.
+
+# <classnames><space><high-level class name>
+back dos
+buffer_overflow u2r
+ftp_write r2l
+guess_passwd r2l
+imap r2l
+ipsweep probe
+land dos
+loadmodule u2r
+multihop r2l
+neptune dos
+nmap probe
+perl u2r
+phf r2l
+pod dos
+portsweep probe
+rootkit u2r
+satan probe
+smurf dos
+spy r2l
+teardrop dos
+warezclient r2l
+warezmaster r2l
+
+
+#14 additional classes in testData. In the format <'classname>,<space> #<highlevel class name>
+
+['apache2.',#DoS
+'worm.',
+'xlock.', #R2L
+'xsnoop.',#R2L
+'xterm.', #U2R
+'httptunnel.', #R2L
+'processtable.', #DoS
+'ps.',          #U2R
+'saint.',       
+'sendmail.',   # DOS
+'snmpgetattack.',#R2L
+'snmpguess.',
+'sqlattack.', #U2R
+'udpstorm.'] #DoS
+
+
+#list of class names
+['back.', 
+'buffer_overflow.', 
+'ftp_write.', 
+'guess_passwd.', 
+'imap.',  
+'ipsweep.', 
+'land.', 
+'loadmodule.', 
+'multihop.', 
+'neptune.',
+'nmap.', 
+'normal.', 
+'perl.',
+'phf.', 
+'pod.', 
+'portsweep.',
+'rootkit.',
+'satan.',
+'smurf.', 
+'spy.', 
+'teardrop.', 
+'warezclient.',
+'warezmaster.']
