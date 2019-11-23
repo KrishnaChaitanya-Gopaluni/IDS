@@ -45,6 +45,9 @@ def model_1(data, test):
 
 
 
+def model_2(data, test):
+    
+
 
 
 
