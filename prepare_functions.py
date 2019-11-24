@@ -17,8 +17,8 @@ naming intrusions
 '''
 def className_replace(x):
     if x != 'normal.':
-        return 'attack'
-    return x        
+        return 1
+    return 0        
 
 '''
 Use feature hasing rather than one hot encoding for the features  ["protocol_type","service","flag"] . Because, these Categorical feature have many
