@@ -3,6 +3,7 @@ from model_functions import *
 from models import *
 import argparse
 from tqdm import tqdm
+import numpy as np
 
 
 parser = argparse.ArgumentParser(description='pass sampling method and number of experiments')
@@ -13,12 +14,13 @@ args = parser.parse_args()
 
 data = prepare_data('train')
 test = prepare_data('test')
-
-for i in tqdm(range(args.exp), desc= "All experiments Progress"):
+rands = np.random.randint(5,100, size = args.exp)
+for i in range(args.exp):
 
 
     #shuffle the records for the random experiments
-    data = data.sample(frac = 1).reset_index(drop=True)
+    if i != 0:
+        data = data.sample(frac = 1, random_state = rands[i]).reset_index(drop=True)
 
     model_2(data, test,i, method = args.mth, initialCheck_point = 49014, samples_peround  = 48984) #Active learning
 
