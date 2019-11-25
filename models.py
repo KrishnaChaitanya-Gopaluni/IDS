@@ -23,7 +23,7 @@ def model_1(data, test):#xgboost
     return classifier
   
 
-def model_2(data, test,experiment,method = 'entropy', initialCheck_point = 49014, samples_peround  = 48984): #Active learning
+def model_2(data, test,experiment,method = 'entropy', initialCheck_point = 49014, samples_peround  = 48984): #this model supports three active learning
     acc = []# on whole test data
     acc_unlabeled = []
     acc_labeled = []
@@ -66,7 +66,7 @@ def model_2(data, test,experiment,method = 'entropy', initialCheck_point = 49014
         labeled_data = pd.concat([labeled_data, unlabeled_data.loc[idx]], axis =0).reset_index(drop = True)
         unlabeled_data = unlabeled_data.drop(idx).reset_index(drop = True)
        
-        del classifier
+        del classifier # trash the old model to build the new one
        
         classifier = xgboost.XGBClassifier(n_jobs=mp.cpu_count(), objective='binary:logistic')
         classifier.fit(labeled_data.iloc[:,0:60], labeled_data[['classes']])
@@ -74,7 +74,10 @@ def model_2(data, test,experiment,method = 'entropy', initialCheck_point = 49014
         #claculate accuracy
         acc.append(accuracy(test,classifier.predict(test.iloc[:,0:60])))
         acc_labeled.append(accuracy(labeled_data,classifier.predict(labeled_data.iloc[:,0:60])))
-        acc_unlabeled.append(accuracy(unlabeled_data,classifier.predict(unlabeled_data.iloc[:,0:60])))
+        if unlabeled_data.shape[0]!=0:
+            acc_unlabeled.append(accuracy(unlabeled_data,classifier.predict(unlabeled_data.iloc[:,0:60])))
+        else:
+            acc_unlabeled.append(acc_unlabeled[len(acc_unlabeled)-1])
 
         #claculate precision
         pres_normal.append(pres(test,classifier.predict(test.iloc[:,0:60]),posLabel = 'normal.'))
