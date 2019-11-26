@@ -21,16 +21,6 @@ def pres(test, y_pred,posLabel = 'normal.'):
     pres_binary = precision_score(test[['classes']], y_pred, labels=[posLabel], pos_label = posLabel,average ='binary')
 
     return [pres_wt,pres_micro, pres_macro , pres_binary]
-'''
-    ----
-    as this is a binary classification, 
-    precision calculation of this commented and the uncomented code are the same
-    -----
-    pres_normal_wt = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='weighted')
-    pres_normal_micro = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='micro')
-    pres_normal_macro = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='macro')
-    pres_normal_binary = precision_score(test[['classes']], y_pred, labels=['attack', 'normal.'], pos_label = 'normal.',average ='binary')
-'''
 
     
 def entropy_sampling(unlabeled_pairs, xgboost_model, sample_size = 48984):
@@ -48,7 +38,6 @@ def margin(temp,temp2):
     return temp2[temp[0]]- temp2[temp[1]]
 
       
-
 def margin_sampling(unlabeled_pairs, xgboost_model, sample_size = 48984):
 
     temp = xgboost_model.predict_proba(unlabeled_pairs).tolist()
@@ -62,4 +51,6 @@ def random_sampling(unlabeled_pairs, xgboost_model, sample_size = 48984):
     
     return random.sample(range(len(unlabeled_pairs)),sample_size)
     
-
+#upper confidance bound, a solution to the multiarmed bandit problem
+def get_ucb(mean, n, c, t ):
+    return [mean[i] + np.sqrt(np.log(t)/n[i])*c for i in range(len(mean)) ]

@@ -6,14 +6,21 @@ from tqdm import tqdm
 import numpy as np
 
 
-parser = argparse.ArgumentParser(description='pass sampling method and number of experiments')
-parser.add_argument("--exp", required=True, default=1, type=int, help="Enter number of experiments to repeat with shuffled data")
-parser.add_argument("--mth", required=True, type=str, help="sampling name:entropy/margin/random")
+# parser = argparse.ArgumentParser(description='pass sampling method and number of experiments')
+# parser.add_argument("--exp", required=True, default=1, type=int, help="Enter number of experiments to repeat with shuffled data")
+# parser.add_argument("--mth", required=True, type=str, help="sampling name:entropy/margin/random")
 
-args = parser.parse_args()
+# args = parser.parse_args()
 
 data = prepare_data('train')
 test = prepare_data('test')
+
+
+#0th  experiment(3rd parameter)
+model_3(data, test,0, initialCheck_point = 49014, samples_peround  = 48984) #UCB Active learning Experiment
+
+'''
+#uncommet to run active learning
 rands = np.random.randint(5,100, size = args.exp)
 for i in range(args.exp):
 
@@ -24,4 +31,4 @@ for i in range(args.exp):
 
     model_2(data, test,i, method = args.mth, initialCheck_point = 49014, samples_peround  = 48984) #Active learning
 
-
+'''
