@@ -11,6 +11,7 @@ import os
 def model_1(data, test):#xgboost
                                                                             
     classifier = xgboost.XGBClassifier(n_jobs=mp.cpu_count())
+    print("base lime model training has started")
     classifier.fit(data.iloc[:,0:60], data[['classes']])
     y_pred = classifier.predict(test.iloc[:,0:60])
     #accuracy of the model #0.9273891739650449
@@ -152,7 +153,7 @@ def model_3(data, test,experiment,initialCheck_point = 49014, samples_peround  =
             ucbs = get_ucb(running_means, numbers_of_selections, c, i+1)
             ucb_values.append(ucbs)
             arm = np.argmax(np.array(ucbs))
-            strgy = st[arm]
+            strgy = st[arm]# select the sampling technique which has max value of UCB
             model_selected.append(arm)
             numbers_of_selections[arm] += 1
             print(" UCB selected Strategy" +strgy )
